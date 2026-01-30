@@ -19,7 +19,7 @@ A local LLM coding assistant that connects to LM Studio over your network. Think
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/aingel.git
+git clone https://github.com/jamiejefferson/aingel.git
 cd aingel
 npm install
 npm run build
