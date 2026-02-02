@@ -88,6 +88,10 @@ Always use relative paths from the project root. Be concise and helpful.`;
         console.log(chalk.blue(`  Current model: ${this.client.getModel()}\n`));
         break;
 
+      case 'models':
+        await this.listAndSelectModel();
+        break;
+
       case 'history':
         console.log(chalk.blue(`  Messages in history: ${this.history.length}\n`));
         break;
@@ -98,6 +102,7 @@ Always use relative paths from the project root. Be concise and helpful.`;
     /quit, /exit, /q  - Exit Aingel
     /clear            - Clear conversation history
     /model            - Show current model
+    /models           - List and switch models
     /history          - Show message count
     /help             - Show this help
 `));
@@ -180,6 +185,63 @@ Always use relative paths from the project root. Be concise and helpful.`;
     } else {
       console.log(chalk.gray('(no response)'));
       console.log('');
+    }
+  }
+
+  private async listAndSelectModel(): Promise<void> {
+    try {
+      const models = await this.client.listModels();
+      if (models.length === 0) {
+        console.log(chalk.yellow('  No models available on this server.\n'));
+        return;
+      }
+
+      const currentModel = this.client.getModel();
+      console.log(chalk.blue('\n  Available models:'));
+      models.forEach((model, i) => {
+        const isCurrent = model.id === currentModel ? chalk.green(' (current)') : '';
+        console.log(chalk.gray(`    ${i + 1}. ${model.id}${isCurrent}`));
+      });
+      console.log('');
+
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+
+      const input = await new Promise<string>((resolve) => {
+        rl.question(chalk.cyan('  Select model (number or name): '), (answer) => {
+          rl.close();
+          resolve(answer.trim());
+        });
+      });
+
+      if (!input) {
+        console.log(chalk.gray('  Keeping current model.\n'));
+        return;
+      }
+
+      const num = parseInt(input, 10);
+      let selectedModel: string | undefined;
+
+      if (!isNaN(num) && num >= 1 && num <= models.length) {
+        selectedModel = models[num - 1].id;
+      } else {
+        const byName = models.find(m => m.id.toLowerCase().includes(input.toLowerCase()));
+        if (byName) selectedModel = byName.id;
+      }
+
+      if (selectedModel && selectedModel !== currentModel) {
+        this.client.setModel(selectedModel);
+        console.log(chalk.green(`  ✓ Switched to: ${selectedModel}\n`));
+      } else if (!selectedModel) {
+        console.log(chalk.red(`  Model not found: ${input}\n`));
+      } else {
+        console.log(chalk.gray('  Already using that model.\n'));
+      }
+    } catch (error) {
+      const err = error as Error;
+      console.log(chalk.red(`  Error listing models: ${err.message}\n`));
     }
   }
 

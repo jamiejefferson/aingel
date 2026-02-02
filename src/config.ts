@@ -3,10 +3,18 @@ import { join } from 'path';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 
+export interface LLMServer {
+  name: string;
+  host: string;
+  port: number;
+}
+
 export interface Config {
   host: string;
   port: number;
   recentFolders: string[];
+  servers: LLMServer[];
+  defaultServer?: string;
 }
 
 const CONFIG_PATH = join(homedir(), '.aingel.json');
@@ -15,6 +23,7 @@ const DEFAULT_CONFIG: Config = {
   host: '',
   port: 1234,
   recentFolders: [],
+  servers: [],
 };
 
 export async function loadConfig(): Promise<Config> {
@@ -54,6 +63,29 @@ export async function updateHost(host: string, port: number = 1234): Promise<voi
   const config = await loadConfig();
   config.host = host;
   config.port = port;
+  await saveConfig(config);
+}
+
+export async function addServer(server: LLMServer): Promise<void> {
+  const config = await loadConfig();
+  // Remove if exists (by name), then add
+  config.servers = config.servers.filter(s => s.name !== server.name);
+  config.servers.push(server);
+  await saveConfig(config);
+}
+
+export async function removeServer(name: string): Promise<void> {
+  const config = await loadConfig();
+  config.servers = config.servers.filter(s => s.name !== name);
+  if (config.defaultServer === name) {
+    config.defaultServer = undefined;
+  }
+  await saveConfig(config);
+}
+
+export async function setDefaultServer(name: string): Promise<void> {
+  const config = await loadConfig();
+  config.defaultServer = name;
   await saveConfig(config);
 }
 

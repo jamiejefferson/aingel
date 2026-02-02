@@ -5,6 +5,8 @@ A local LLM coding assistant that connects to LM Studio over your network. Think
 ## Features
 
 - Connects to LM Studio's OpenAI-compatible API
+- **Multi-server support** - configure and switch between multiple LLM servers
+- **Model selection** - choose from available models at startup or mid-session
 - Streaming responses with tool calling support
 - File operations: read, write, list, search
 - Shell command execution (with confirmation)
@@ -35,11 +37,32 @@ aingel
 # Open a specific folder
 aingel /path/to/project
 
-# Specify LM Studio location
+# Connect to a specific server by name
+aingel --server llama
+aingel -s mistral
+
+# Specify host/port directly
 aingel --host 192.168.1.50 --port 1234
 ```
 
-On first run, you'll be prompted for your LM Studio server IP. This is saved to `~/.aingel.json`.
+On first run, you'll be prompted to configure your first LLM server. This is saved to `~/.aingel.json`.
+
+### Multi-Server Setup
+
+Aingel supports multiple LLM servers. On startup, if you have multiple servers configured, you'll see a selection menu:
+
+```
+  Select an LLM server:
+    1. llama - 192.168.1.50:1234 (default)
+    2. mistral - 192.168.1.51:1234
+    3. Add new server
+```
+
+You can also skip the menu by using the `--server` or `-s` flag with the server name.
+
+### Model Selection
+
+When a server has multiple models loaded, you'll be prompted to choose one. You can also switch models mid-session using the `/models` command.
 
 ### Commands
 
@@ -48,6 +71,7 @@ On first run, you'll be prompted for your LM Studio server IP. This is saved to 
 | `/quit` | Exit Aingel |
 | `/clear` | Clear conversation history |
 | `/model` | Show current model |
+| `/models` | List and switch models |
 | `/history` | Show message count |
 | `/help` | Show available commands |
 
