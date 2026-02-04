@@ -20,7 +20,7 @@ export interface Config {
 const CONFIG_PATH = join(homedir(), '.aingel.json');
 
 const DEFAULT_CONFIG: Config = {
-  host: 'glw-des-jj.local',
+  host: '10.10.5.30',
   port: 1234,
   recentFolders: [],
   servers: [],

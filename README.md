@@ -95,7 +95,7 @@ The assistant can use these tools to help with your code:
 1. Open LM Studio and load a model (e.g., Qwen Coder, DeepSeek Coder, etc.)
 2. Go to the "Local Server" tab
 3. Click "Start Server"
-4. Note your computer's local IP address (e.g., `192.168.1.50`)
+4. Note your computer's local IP address (the team server is `10.10.5.30`)
 5. Make sure port 1234 is accessible on your network
 
 ## License
